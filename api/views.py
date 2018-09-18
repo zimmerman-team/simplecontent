@@ -1,28 +1,32 @@
 import logging
 import smtplib
+import json
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 from django.conf import settings
+
 from rest_framework import views
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.exceptions import NotFound, NotAcceptable, server_error
 
-from api import helper
-from content.models import EmailContent
+from api import helper, serializers
+from content.models import EmailContent, LanguageContent
 
 
-class ShareLink(views.APIView):
-    """
-    Simple send email for the share link
-    """
-
+class ShareLinkView(views.APIView):
     permission_classes = (helper.RemoteHostPermission, )
 
-    def post(self, request, format=None):
-        message = MIMEMultipart('alternative')
+    def get_serializer(self):
+        return serializers.ShareLinkSerializer()
 
+    def post(self, request, *args, **kwargs):
+        """
+        The endpoint to sent an email share link.
+        """
+        message = MIMEMultipart('alternative')
         message['From'] = settings.SIMPLE_MAIL.get('FROM_EMAIL')
 
         try:
@@ -60,8 +64,41 @@ class ShareLink(views.APIView):
         except Exception as e:
             logging.exception(e)
 
-            return Response(status=status.HTTP_406_NOT_ACCEPTABLE,
-                            data={'message': 'Not acceptable!'})
+            # *** For security reason ***
+            # If something errors when send an email,
+            # just send to the client is not acceptable.
+            # And for more detail about the error can check it
+            # on the logging errors
+            raise NotAcceptable
 
-        return Response(status=status.HTTP_200_OK,
-                        data={'message': 'Success!'})
+        return Response(
+            status=status.HTTP_200_OK, data={'message': 'Success!'})
+
+
+class LanguageContentView(views.APIView):
+    permission_classes = (helper.RemoteHostPermission, )
+
+    def get(self, request, *args, **kwargs):
+        """
+        The endpoint presents the language content by a language code.
+        <br>
+        **The language content** is content by specific language to show
+        them on the frontend side.
+        """
+        language_code = kwargs.get('language_code')
+        try:
+            language_content = LanguageContent.objects.get(
+                language_code=language_code)
+
+            with open(language_content.json_file.file.name) as json_file:
+                data = json.load(json_file)
+
+        except LanguageContent.DoesNotExist:
+            raise NotFound
+
+        except Exception as e:
+            logging.exception(e)
+
+            raise server_error(request, *args, **kwargs)
+
+        return Response(status=status.HTTP_200_OK, data=data)

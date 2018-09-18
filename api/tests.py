@@ -1,8 +1,10 @@
 from django.test import TestCase
+from django.core.files.base import ContentFile
+
 from rest_framework.test import APIClient
 from rest_framework import status
 
-from content.models import EmailContent
+from content.models import EmailContent, LanguageContent
 
 
 class ShareLinkTest(TestCase):
@@ -57,3 +59,24 @@ class ShareLinkTest(TestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class LanguageContentTest(TestCase):
+
+    def test_language_content_ok(self):
+        client = APIClient()
+
+        json_file = ContentFile('{"test": "test"}', name='test.json')
+        LanguageContent(
+            language_code='en',
+            json_file=json_file).save()
+
+        # Because the permission class is protected by remote host,
+        # we set REMOTE_HOST value to allowed host.
+        response = client.get(
+            path='/api/language-content/en/',
+            data=None,
+            follow=False,
+            **{'REMOTE_HOST': 'localhost:3000'})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

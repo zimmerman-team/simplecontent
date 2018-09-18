@@ -80,7 +80,7 @@ class LanguageContentTest(TestCase):
         entry.json_file = file_mock
         entry.save()
 
-        folder_filname = '{folder}/{filename}'.format(
+        folder_filename = '{folder}/{filename}'.format(
             folder='language-content', filename=file_mock.name)
 
-        self.assertEqual(entry.json_file.name, folder_filname)
+        self.assertEqual(entry.json_file.name, folder_filename)
