@@ -19,10 +19,12 @@ from content.models import EmailContent, LanguageContent
 class ShareLinkView(views.APIView):
     permission_classes = (helper.RemoteHostPermission, )
 
-    def get_serializer(self):
+    @classmethod
+    def get_serializer(cls):
         return serializers.ShareLinkSerializer()
 
-    def post(self, request, *args, **kwargs):
+    @classmethod
+    def post(cls, request, *args, **kwargs):
         """
         The endpoint to sent an email share link.
         """
@@ -78,7 +80,8 @@ class ShareLinkView(views.APIView):
 class LanguageContentView(views.APIView):
     permission_classes = (helper.RemoteHostPermission, )
 
-    def get(self, request, *args, **kwargs):
+    @classmethod
+    def get(cls, request, *args, **kwargs):
         """
         The endpoint presents the language content by a language code.
         <br>
