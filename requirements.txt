@@ -3,3 +3,5 @@ djangorestframework==3.8.2
 requests==2.19.1
 mock==2.0.0
 django-rest-swagger==2.2.0
+git+git://github.com/nnseva/django-jsoneditor.git#django-json-editor
+git+https://github.com/zimmerman-zimmerman/django-json-field.git#egg=django-json-field

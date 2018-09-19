@@ -89,13 +89,10 @@ class LanguageContentView(views.APIView):
         them on the frontend side.
         """
         language_code = kwargs.get('language_code')
+        type = kwargs.get('type')
         try:
             language_content = LanguageContent.objects.get(
-                language_code=language_code)
-
-            with open(language_content.json_file.file.name) as json_file:
-                data = json.load(json_file)
-
+                language_code=language_code, type=type)
         except LanguageContent.DoesNotExist:
             raise NotFound
 
@@ -104,4 +101,5 @@ class LanguageContentView(views.APIView):
 
             raise server_error(request, *args, **kwargs)
 
-        return Response(status=status.HTTP_200_OK, data=data)
+        return Response(status=status.HTTP_200_OK,
+                        data=language_content.content)

@@ -1,7 +1,4 @@
-import mock
-
 from django.test import TestCase
-from django.core.files import File
 from django.db.utils import IntegrityError
 
 from content.models import EmailContent, LanguageContent
@@ -42,45 +39,26 @@ class EmailContentTest(TestCase):
 class LanguageContentTest(TestCase):
 
     def test_language_content_exists(self):
-        file_mock = mock.MagicMock(spec=File)
-        file_mock.name = 'file_mock.json'
-
         entry = LanguageContent(
             language_code='en',
-            json_file=file_mock)
+            type='ui',
+            content="{'test': 'test'}")
         entry.save()
 
-        self.assertEqual(str(entry), entry.language_code)
+        self.assertEqual(str(entry), '{type}, {language_code}'.format(
+            type=entry.type, language_code=entry.language_code))
 
     def test_language_content_duplicate(self):
         """
         LanguageContent has the unique on the language_code field
         """
-        file_mock = mock.MagicMock(spec=File)
-        file_mock.name = 'file_mock.json'
-
         with self.assertRaises(IntegrityError):
             LanguageContent(
                 language_code='en',
-                json_file=file_mock).save()
+                type='ui',
+                content="{'test': 'test'}").save()
 
             LanguageContent(
                 language_code='en',
-                json_file=file_mock).save()
-
-    def test_should_the_same_filename(self):
-        file_mock = mock.MagicMock(spec=File)
-        file_mock.name = 'file_mock.json'
-
-        entry = LanguageContent(
-            language_code='en',
-            json_file=file_mock)
-        entry.save()
-
-        entry.json_file = file_mock
-        entry.save()
-
-        folder_filename = '{folder}/{filename}'.format(
-            folder='language-content', filename=file_mock.name)
-
-        self.assertEqual(entry.json_file.name, folder_filename)
+                type='ui',
+                content="{'test': 'test'}").save()

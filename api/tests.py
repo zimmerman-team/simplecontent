@@ -1,5 +1,4 @@
 from django.test import TestCase
-from django.core.files.base import ContentFile
 
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -66,15 +65,15 @@ class LanguageContentTest(TestCase):
     def test_language_content_ok(self):
         client = APIClient()
 
-        json_file = ContentFile('{"test": "test"}', name='test.json')
         LanguageContent(
             language_code='en',
-            json_file=json_file).save()
+            type='ui',
+            content="{'test': 'test'}").save()
 
         # Because the permission class is protected by remote host,
         # we set REMOTE_HOST value to allowed host.
         response = client.get(
-            path='/api/language-content/en/',
+            path='/api/language-content/en/ui/',
             data=None,
             follow=False,
             **{'REMOTE_HOST': 'localhost:3000'})
