@@ -123,7 +123,7 @@ class ShareLinkViewTest(TestCase):
             html='<div>{link}</div>').save()
 
         response = client.post(
-            path='/api/share-link/',
+            path='/content/share-link/',
             data={
                 'email': 'taufik@zimmermanzimmerman.nl',
                 'language_code': 'en',
