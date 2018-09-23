@@ -16,6 +16,7 @@ class OverwriteStorage(FileSystemStorage):
 
         return name
 
+
 class RemoteHostPermission(permissions.BasePermission):
     """
     Custom Permission is only for the host which is already registered
@@ -24,7 +25,8 @@ class RemoteHostPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         if request.META.get('REMOTE_HOST') in \
-                settings.SIMPLE_MAIL.get('REMOTE_HOST_PERMISSION'):
+                settings.SIMPLE_MAIL.get('REMOTE_HOST_PERMISSION') or \
+                request.method == 'GET' or request.user.is_authenticated:
             return True
 
         return False

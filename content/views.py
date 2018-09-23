@@ -10,14 +10,14 @@ from rest_framework import views
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import NotFound, NotAcceptable, server_error
-from rest_framework.permissions import IsAuthenticated
 
 from content import helper, serializers
 from content.models import EmailContent, LanguageContent
 
 
 class ShareLinkView(views.APIView):
-    permission_classes = (helper.RemoteHostPermission, IsAuthenticated)
+    permission_classes = (
+        helper.RemoteHostPermission, )
 
     @classmethod
     def get_serializer(cls):
@@ -79,7 +79,8 @@ class ShareLinkView(views.APIView):
 
 
 class LanguageContentView(views.APIView):
-    permission_classes = (helper.RemoteHostPermission, IsAuthenticated)
+    permission_classes = (
+        helper.RemoteHostPermission, )
 
     @classmethod
     def get(cls, request, *args, **kwargs):
