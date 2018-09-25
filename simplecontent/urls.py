@@ -24,7 +24,7 @@ schema_view = get_swagger_view(title=settings.API_HEADER)
 urlpatterns = [
     url(r'^$', schema_view),
     url(r'^admin/', admin.site.urls),
-    url(r'^api/', include('api.urls')),
+    url(r'^content/', include('content.urls')),
     url(r'^api-auth/', include('rest_framework.urls',
                                namespace='rest_framework'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
