@@ -80,6 +80,8 @@ class MediaContent(models.Model):
     content_type = models.CharField(max_length=15, choices=CONTENT_TYPES)
     image = models.ImageField(
         upload_to='media-content', storage=OverwriteStorage())
+    title = models.CharField(max_length=200, unique=True)
+    slug = models.SlugField(unique=True)
 
     def __str__(self):
         return '{content_type}, {image_name}'.format(

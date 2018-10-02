@@ -18,7 +18,9 @@ class LanguageContentAdmin(admin.ModelAdmin):
 
 
 class MediaContentAdmin(admin.ModelAdmin):
-    list_display = ('id', 'updated_at', 'content_type', 'image')
+    list_display = (
+        'id', 'updated_at', 'title', 'slug', 'content_type', 'image')
+    prepopulated_fields = {"slug": ("title", )}
 
 
 admin.site.register(EmailContent, EmailContentAdmin)

@@ -1,11 +1,12 @@
 from django.test import TestCase
 from django.db.utils import IntegrityError
-from django.core.files.base import ContentFile
+from django.urls import reverse
 
 from rest_framework.test import APIClient
 from rest_framework import status
 
 from content.models import EmailContent, LanguageContent, MediaContent
+from content.factories import MediaContentFactory
 
 
 class EmailContentModelTest(TestCase):
@@ -69,44 +70,12 @@ class LanguageContentModelTest(TestCase):
                 content="{'test': 'test'}").save()
 
 
-class ImageContentModelTest(TestCase):
+class MediaContentModelTest(TestCase):
 
-    def test_image_content_exists(self):
-        # hex encoded bytes of a tiny valid png file
-        valid_png_hex = ['\x89', 'P', 'N', 'G', '\r', '\n', '\x1a', '\n',
-                         '\x00',
-                         '\x00', '\x00', '\r', 'I', 'H', 'D', 'R', '\x00',
-                         '\x00', '\x00', '\x01', '\x00', '\x00', '\x00',
-                         '\x01',
-                         '\x08', '\x02', '\x00', '\x00', '\x00', '\x90',
-                         'w', 'S', '\xde', '\x00', '\x00', '\x00', '\x06', 'b',
-                         'K',
-                         'G', 'D', '\x00', '\x00', '\x00', '\x00',
-                         '\x00', '\x00', '\xf9', 'C', '\xbb', '\x7f', '\x00',
-                         '\x00',
-                         '\x00', '\t', 'p', 'H', 'Y', 's', '\x00',
-                         '\x00', '\x0e', '\xc3', '\x00', '\x00', '\x0e',
-                         '\xc3',
-                         '\x01', '\xc7', 'o', '\xa8', 'd', '\x00', '\x00',
-                         '\x00', '\x07', 't', 'I', 'M', 'E', '\x07', '\xe0',
-                         '\x05',
-                         '\r', '\x08', '%', '/', '\xad', '+', 'Z',
-                         '\x89', '\x00', '\x00', '\x00', '\x0c', 'I', 'D', 'A',
-                         'T',
-                         '\x08', '\xd7', 'c', '\xf8', '\xff', '\xff',
-                         '?', '\x00', '\x05', '\xfe', '\x02', '\xfe', '\xdc',
-                         '\xcc',
-                         'Y', '\xe7', '\x00', '\x00', '\x00', '\x00',
-                         'I', 'E', 'N', 'D', '\xae', 'B', '`', '\x82']
-        valid_png_bin = "".join(valid_png_hex)
-        image_file = ContentFile(valid_png_bin)
-        image_file.name = 'image_file.png'
-
-        entry = MediaContent(content_type=MediaContent.HOME, image=image_file)
-        entry.save()
-
-        self.assertEqual(str(entry), '{content_type}, {image_name}'.format(
-            content_type=entry.content_type, image_name=entry.image.name))
+    def test_media_content_exists(self):
+        media_content = MediaContentFactory()
+        # If id more than 0, the mean is the data is already saved
+        self.assertTrue(media_content.id > 0)
 
 
 class ShareLinkViewTest(TestCase):
@@ -182,3 +151,20 @@ class LanguageContentViewTest(TestCase):
             **{'REMOTE_HOST': 'localhost:3000'})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class MediaContentViewTest(TestCase):
+
+    def test_media_content_ok(self):
+        # Check if the endpoint of the current media content is working.
+        client = APIClient()
+        media_content = MediaContentFactory()
+        url = reverse(
+            'content:api-media-content', kwargs={'slug': media_content.slug})
+        response = client.get(path=url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+
+
+
