@@ -3,10 +3,6 @@ from jsoneditor.fields.django_json_field import JSONField
 
 from content.helper import OverwriteStorage
 
-LANGUAGES = (
-    ('en', 'English'),
-)
-
 
 class EmailContent(models.Model):
     """
@@ -16,53 +12,35 @@ class EmailContent(models.Model):
     Type and language code is unique together, so only one content for
     specific type each language code
     """
-    SHARE_LINK = 'share_link'
-    EMAIL_TYPES = (
-        (SHARE_LINK, 'Share Link'),
-    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    content_type = models.CharField(max_length=15, choices=EMAIL_TYPES)
-    language_code = models.CharField(max_length=2, choices=LANGUAGES)
+    title = models.CharField(max_length=200, unique=True)
+    slug = models.SlugField(unique=True)
     subject = models.CharField(max_length=200)
     text = models.TextField()
     html = models.TextField()
-
-    class Meta:
-        unique_together = ('content_type', 'language_code')
 
     def __str__(self):
         return self.subject
 
 
-class LanguageContent(models.Model):
+class JSONContent(models.Model):
     """
-    The model of the JSON data.
-
-    This feature to cover some static data in the frontend
-    with ability to change it, like the following:
-    - The UI static text, menu text, breadcrumb text, footer text.
-    - Or just general JSON data is record type which needed
-      to parse them on the frontend.
+    The idea of JSON Content:
+    We have many different the content on the frontend, like the following:
+    - Content by language for each page
+    - Specific data on specific page
+    - Specific data which not possible to put it on database
+    - Specific data should be on the JSON type
     """
-    UI = 'ui'
-    FUNDING_GOES = 'funding_goes'
-    CONTENT_TYPES = (
-        (UI, 'UI'),
-        (FUNDING_GOES, 'Funding Goes')
-    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    content_type = models.CharField(max_length=15, choices=CONTENT_TYPES)
-    language_code = models.CharField(max_length=2, choices=LANGUAGES)
+    title = models.CharField(max_length=200, unique=True)
+    slug = models.SlugField(unique=True)
     content = JSONField()
 
-    class Meta:
-        unique_together = ('content_type', 'language_code')
-
     def __str__(self):
-        return '{content_type}, {language_code}'.format(
-            content_type=self.content_type, language_code=self.language_code)
+        return self.title
 
 
 class MediaContent(models.Model):
@@ -71,18 +49,12 @@ class MediaContent(models.Model):
     And the field is a content type as page to manage the image is related
     to the one page.
     """
-    HOME = 'home'
-    CONTENT_TYPES = (
-        (HOME, 'Home'),
-    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    content_type = models.CharField(max_length=15, choices=CONTENT_TYPES)
-    image = models.ImageField(
-        upload_to='media-content', storage=OverwriteStorage())
     title = models.CharField(max_length=200, unique=True)
     slug = models.SlugField(unique=True)
+    image = models.ImageField(
+        upload_to='media-content', storage=OverwriteStorage())
 
     def __str__(self):
-        return '{content_type}, {image_name}'.format(
-            content_type=self.content_type, image_name=self.image.name)
+        return self.title
