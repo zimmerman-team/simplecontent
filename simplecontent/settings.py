@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_swagger',
+    'corsheaders',
     'jsoneditor',
     'content',
 ]
@@ -46,6 +47,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -167,6 +169,15 @@ SWAGGER_SETTINGS = {
     'APIS_SORTER': 'alpha',
     'SECURITY_DEFINITIONS': None,
 }
+
+# CORS
+# Change this configuration to False on the production.
+# And put it on local_settings.py, also use
+# a configuration CORS_ORIGIN_WHITELIST
+# Read this documentation https://github.com/ottoyiu/django-cors-headers/
+# This is important to protect your API to allowed only from white list host.
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 try:
     from .local_settings import *

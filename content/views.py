@@ -12,14 +12,15 @@ from rest_framework import status
 from rest_framework.exceptions import NotFound, NotAcceptable, server_error
 
 from content import helper, serializers
-from content.models import EmailContent, LanguageContent, MediaContent
+from content.models import (
+    EmailContent, MediaContent, JSONContent
+)
 
-from content.serializers import MediaContentSerializer
+from content.serializers import MediaContentSerializer, JSONContentSerializer
 
 
 class ShareLinkView(views.APIView):
-    permission_classes = (
-        helper.RemoteHostPermission, )
+    slug = 'share-link'
 
     @classmethod
     def get_serializer(cls):
@@ -35,12 +36,9 @@ class ShareLinkView(views.APIView):
 
         try:
             message['To'] = request.data.get('email')
-            language_code = request.data.get('language_code')
 
             # Get content email for specific type and language
-            email_content = EmailContent.objects.get(
-                content_type=EmailContent.SHARE_LINK,
-                language_code=language_code)
+            email_content = EmailContent.objects.get(slug=cls.slug)
 
             message['Subject'] = email_content.subject
 
@@ -80,35 +78,6 @@ class ShareLinkView(views.APIView):
             status=status.HTTP_200_OK, data={'message': 'Success!'})
 
 
-class LanguageContentView(views.APIView):
-    permission_classes = (
-        helper.RemoteHostPermission, )
-
-    @classmethod
-    def get(cls, request, *args, **kwargs):
-        """
-        The endpoint presents the language content by a language code.
-        <br>
-        **The language content** is content by specific language to show
-        them on the frontend side.
-        """
-        language_code = kwargs.get('language_code')
-        content_type = kwargs.get('content_type')
-        try:
-            language_content = LanguageContent.objects.get(
-                language_code=language_code, content_type=content_type)
-        except LanguageContent.DoesNotExist:
-            raise NotFound
-
-        except Exception as e:
-            logging.exception(e)
-
-            raise server_error(request, *args, **kwargs)
-
-        return Response(status=status.HTTP_200_OK,
-                        data=language_content.content)
-
-
 class MediaContentView(views.APIView):
 
     @classmethod
@@ -119,8 +88,26 @@ class MediaContentView(views.APIView):
         **The media content** is endpoint to present the URL of the media file.
         """
         try:
-            media_content = MediaContent.objects.get(slug= kwargs.get('slug'))
+            media_content = MediaContent.objects.get(slug=kwargs.get('slug'))
             serializer = MediaContentSerializer(media_content)
+
+            return Response(serializer.data)
+        except MediaContent.DoesNotExist:
+            raise NotFound
+
+
+class JSONContentView(views.APIView):
+
+    @classmethod
+    def get(cls, request, *args, **kwargs):
+        """
+        The endpoint presents the JSON content by slug request.
+        <br>
+        **The JSON content** is endpoint to present the JSON content.
+        """
+        try:
+            json_content = JSONContent.objects.get(slug=kwargs.get('slug'))
+            serializer = JSONContentSerializer(json_content)
 
             return Response(serializer.data)
         except MediaContent.DoesNotExist:
