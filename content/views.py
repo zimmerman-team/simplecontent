@@ -12,7 +12,9 @@ from rest_framework import status
 from rest_framework.exceptions import NotFound, NotAcceptable, server_error
 
 from content import helper, serializers
-from content.models import EmailContent, LanguageContent
+from content.models import EmailContent, LanguageContent, MediaContent
+
+from content.serializers import MediaContentSerializer
 
 
 class ShareLinkView(views.APIView):
@@ -105,3 +107,21 @@ class LanguageContentView(views.APIView):
 
         return Response(status=status.HTTP_200_OK,
                         data=language_content.content)
+
+
+class MediaContentView(views.APIView):
+
+    @classmethod
+    def get(cls, request, *args, **kwargs):
+        """
+        The endpoint presents the media content by slug request.
+        <br>
+        **The media content** is endpoint to present the URL of the media file.
+        """
+        try:
+            media_content = MediaContent.objects.get(slug= kwargs.get('slug'))
+            serializer = MediaContentSerializer(media_content)
+
+            return Response(serializer.data)
+        except MediaContent.DoesNotExist:
+            raise NotFound

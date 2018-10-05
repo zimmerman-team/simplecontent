@@ -5,3 +5,4 @@ git+https://github.com/zimmerman-zimmerman/django-rest-swagger.git#django-rest-s
 git+git://github.com/nnseva/django-jsoneditor.git#django-json-editor
 git+https://github.com/zimmerman-zimmerman/django-json-field.git#egg=django-json-field
 pillow==5.2.0
+factory-boy==2.11.1
