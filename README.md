@@ -1,2 +1,2 @@
 # simplecontent
-The simple backend for the static data &amp; API
+The API for simple content & static file. 
