@@ -1,5 +1,5 @@
 django==2.1.2
-djangorestframework==3.8.2
+djangorestframework==3.9.1
 requests==2.20.0
 git+https://github.com/zimmerman-zimmerman/django-rest-swagger.git#django-rest-swagger
 git+git://github.com/nnseva/django-jsoneditor.git#django-json-editor
